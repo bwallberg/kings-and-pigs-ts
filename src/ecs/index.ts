@@ -54,3 +54,5 @@ export function init() {
 		},
 	};
 }
+
+export type ECS = ReturnType<typeof init>;

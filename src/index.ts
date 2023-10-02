@@ -1,40 +1,51 @@
-import {
-	RectComponent,
-	TransformComponent,
-	VelocityComponent,
-} from "./components";
+import { BodyComponent } from "./components";
 import { Entity, init } from "./ecs";
 import { InputSystem } from "./systems/InputSystem";
 import { PhysicsSystem } from "./systems/PhysicsSystem";
-import { RenderSystem } from "./systems/RenderSystem";
+import { DebugRenderSystem } from "./systems/DebugRenderSystem";
+
+const canvas = document.querySelector("canvas");
+
+if (!canvas) {
+	throw "[Dungeon Survival] No canvas found!";
+}
 
 // TODO: move this...
-export type World = {
+export type Game = {
 	ecs?: ReturnType<typeof init>;
 	player?: Entity;
+
+	width: number;
+	height: number;
 };
 
-const world: World = {};
+const game: Game = {
+	width: canvas.width,
+	height: canvas.height,
+};
 
-function loop() {
-	world.ecs?.tick();
+function start(ecs) {
+	const loop = () => {
+		ecs?.tick();
+		requestAnimationFrame(loop);
+	}
 	requestAnimationFrame(loop);
 }
 
 function main() {
-	world.ecs = init();
+	const ecs = init();
 
-	const player = world.ecs.create();
-	world.ecs.emplace(player, new VelocityComponent());
-	world.ecs.emplace(player, new TransformComponent());
-	world.ecs.emplace(player, new RectComponent());
-	world.player = player;
+	const player = ecs.create();
 
-	world.ecs?.register(InputSystem(world));
-	world.ecs?.register(PhysicsSystem(world));
-	world.ecs.register(RenderSystem(world));
+	ecs.emplace(player, new BodyComponent(10, 10, 10, 10));
 
-	requestAnimationFrame(loop);
+	game.player = player;
+
+	ecs?.register(InputSystem(ecs, player));
+	ecs?.register(PhysicsSystem(ecs));
+	ecs.register(DebugRenderSystem(ecs));
+
+	start(ecs);
 }
 
 window.onload = main;
