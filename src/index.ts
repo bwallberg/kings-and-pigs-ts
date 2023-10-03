@@ -1,8 +1,10 @@
-import { BodyComponent } from "./components";
 import { Entity, init } from "./ecs";
 import { InputSystem } from "./systems/InputSystem";
 import { PhysicsSystem } from "./systems/PhysicsSystem";
 import { DebugRenderSystem } from "./systems/DebugRenderSystem";
+import { createWorldEdges } from "./physics";
+import { Box, Vec2 } from "planck";
+import { BodyComponent } from "./components";
 
 const canvas = document.querySelector("canvas");
 
@@ -28,16 +30,18 @@ function start(ecs) {
 	const loop = () => {
 		ecs?.tick();
 		requestAnimationFrame(loop);
-	}
+	};
 	requestAnimationFrame(loop);
 }
 
 function main() {
 	const ecs = init();
 
+	createWorldEdges(game.width, game.height);
+
 	const player = ecs.create();
 
-	ecs.emplace(player, new BodyComponent(10, 10, 10, 10));
+	ecs.emplace(player, new BodyComponent(new Vec2(5, 5), new Box(5, 5)));
 
 	game.player = player;
 

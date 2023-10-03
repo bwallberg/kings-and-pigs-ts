@@ -1,55 +1,42 @@
 import { Component } from "../ecs";
-import { physicsWorld } from "../systems/PhysicsSystem";
-import { Body, Box, PolygonShape, Vec2 } from "planck";
+import { Body, FixtureOpt, PolygonShape, Shape, Vec2 } from "planck";
+import { physicsWorld } from "../physics";
 
 export class BodyComponent extends Component {
 	private body: Body;
 
 	constructor(
-		x: number,
-		y: number,
-		width: number,
-		height: number,
+		position: Vec2,
+		shape: Shape,
+		fixtureOpt: FixtureOpt = {
+			density: 1,
+			friction: 0.3,
+		},
 	) {
 		super();
 
 		this.body = physicsWorld.createBody({
 			type: "dynamic",
-			position: new Vec2(x, y),
+			position,
 		});
 
 		this.body.createFixture({
-			shape: new Box(width, height),
-			density: 1,
-			friction: 0.3,
+			shape,
+			...fixtureOpt,
 		});
-		(window as any).bwallberg = this.body;
 	}
 
-	get x() {
-		return this.body.getPosition().x 
+	getPosition() {
+		return this.body.getPosition();
 	}
 
-	get y() {
-		return this.body.getPosition().y;
-	}
-
-	get width() {
-		const shape = this.body.getFixtureList()?.getShape() as PolygonShape;
-
-		const [topRight, bottomRight, topLeft, bottomLeft] = shape.m_vertices;
-
-		// @ts-ignore
-		return Math.abs(topLeft.x) + topRight.x;
-	}
-
-	get height() {
-		const shape = this.body.getFixtureList()?.getShape() as PolygonShape;
-
-		const [topRight, bottomRight, topLeft, bottomLeft] = shape.m_vertices;
-
-		// @ts-ignore
-		return Math.abs(topRight.y) + bottomRight.y;
+	getShape() {
+		const shape = this.body.getFixtureList()?.getShape();
+		if (shape) {
+			if (shape.getType() === "polygon") {
+				return shape as PolygonShape;
+			}
+		}
 	}
 
 	isTouching() {
@@ -63,8 +50,7 @@ export class BodyComponent extends Component {
 		}
 		if (y !== undefined) {
 			velocity.y = y * 50;
-			console.log("bwallberg", velocity.y);
 		}
-		this.body.setLinearVelocity(velocity);	
+		this.body.setLinearVelocity(velocity);
 	}
 }
