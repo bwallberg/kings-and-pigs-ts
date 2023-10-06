@@ -1,23 +1,30 @@
 import { Component } from "../ecs";
-import { Body, FixtureOpt, PolygonShape, Shape, Vec2 } from "planck";
+import { Body, BodyType, FixtureOpt, PolygonShape, Shape, Vec2 } from "planck";
 import { physicsWorld } from "../physics";
+import { EntityType } from "../constants";
 
-export class BodyComponent extends Component {
-	private body: Body;
+export class PhysicsComponent extends Component {
+	public body: Body;
 
-	constructor(
-		position: Vec2,
-		shape: Shape,
-		fixtureOpt: FixtureOpt = {
-			density: 1,
-			friction: 0.3,
-		},
-	) {
+	constructor({
+		entityType,
+		bodyType = "dynamic",
+		position,
+		shape,
+		fixtureOpt = { friction: 1 },
+	}: {
+		entityType: typeof EntityType[keyof typeof EntityType];
+		bodyType?: BodyType;
+		position: Vec2;
+		shape: Shape;
+		fixtureOpt?: FixtureOpt;
+	}) {
 		super();
 
 		this.body = physicsWorld.createBody({
-			type: "dynamic",
+			type: bodyType,
 			position,
+			userData: entityType
 		});
 
 		this.body.createFixture({
@@ -39,18 +46,18 @@ export class BodyComponent extends Component {
 		}
 	}
 
-	isTouching() {
-		return this.body.getContactList()?.contact.isTouching();
-	}
-
 	setVelocity(x?: number, y?: number) {
 		const velocity = this.body.getLinearVelocity();
 		if (x !== undefined) {
-			velocity.x = x * 50;
+			velocity.x = x;
 		}
 		if (y !== undefined) {
-			velocity.y = y * 50;
+			velocity.y = y;
 		}
 		this.body.setLinearVelocity(velocity);
+	}
+
+	public destroy() {
+	  physicsWorld.destroyBody(this.body);
 	}
 }

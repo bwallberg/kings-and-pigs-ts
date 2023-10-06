@@ -1,5 +1,5 @@
 import { ECS, Entity, System } from "../ecs";
-import { BodyComponent } from "../components";
+import { PhysicsComponent } from "../components/PhysicsComponent";
 
 const CORD_SIZE = 2;
 
@@ -15,14 +15,14 @@ export const DebugRenderSystem = (ecs: ECS): System => ({
 		context.clearRect(0, 0, canvas?.width, canvas?.height);
 
 		entities.forEach((entity) => {
-			const body = ecs?.get(entity, BodyComponent);
+			const body = ecs?.get(entity, PhysicsComponent);
 
 			if (body) {
 				const { x, y } = body.getPosition();
 				const vertices = body.getShape()?.m_vertices;
 
 				if (vertices) {
-					context.strokeStyle = "rgba(255, 0, 0, 0.25)";
+					context.strokeStyle = "rgba(255, 0, 0, 0.5)";
 					context.beginPath();
 					context.moveTo(x + vertices[0].x, y + vertices[0].y);
 

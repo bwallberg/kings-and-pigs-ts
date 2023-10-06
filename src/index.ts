@@ -4,7 +4,9 @@ import { PhysicsSystem } from "./systems/PhysicsSystem";
 import { DebugRenderSystem } from "./systems/DebugRenderSystem";
 import { createWorldEdges } from "./physics";
 import { Box, Vec2 } from "planck";
-import { BodyComponent } from "./components";
+import { PhysicsComponent } from "./components/PhysicsComponent";
+import { EntityType } from "./constants";
+import { FallingRocksSystem } from "./systems/FallingRocksSystem";
 
 const canvas = document.querySelector("canvas");
 
@@ -40,12 +42,31 @@ function main() {
 	createWorldEdges(game.width, game.height);
 
 	const player = ecs.create();
+	const rocks = new Array(20).fill(undefined).map(() => ecs.create());
 
-	ecs.emplace(player, new BodyComponent(new Vec2(5, 5), new Box(5, 5)));
+	ecs.emplace(
+		player,
+		new PhysicsComponent({
+			entityType: EntityType.PLAYER,
+			position: new Vec2(5, 700),
+			shape: new Box(8, 18),
+		}),
+	);
+	rocks.forEach((rock, index) => {
+		ecs.emplace(
+			rock,
+			new PhysicsComponent({
+				entityType: EntityType.FALLING_ROCK,
+				position: new Vec2(200 + index * 5, 5),
+				shape: new Box(5, 5),
+			}),
+		);
+	});
 
 	game.player = player;
 
 	ecs?.register(InputSystem(ecs, player));
+	ecs?.register(FallingRocksSystem(ecs, rocks));
 	ecs?.register(PhysicsSystem(ecs));
 	ecs.register(DebugRenderSystem(ecs));
 

@@ -1,6 +1,8 @@
 export type Entity = string;
 
-export abstract class Component {}
+export abstract class Component {
+	public abstract destroy();
+}
 
 export interface System {
 	query: {
@@ -23,6 +25,16 @@ export function init() {
 			registry.push(entity);
 			components.set(entity, new Map());
 			return entity;
+		},
+		delete: (entity: Entity) => {
+			const index = registry.indexOf(entity);
+			if (index > -1) {
+				registry.splice(index, 1);
+				components.get(entity)?.forEach((component) => {
+					component.destroy();
+				});
+				components.delete(entity);
+			}
 		},
 		emplace(entity: Entity, component: Component) {
 			const entityComponents = components.get(entity);
