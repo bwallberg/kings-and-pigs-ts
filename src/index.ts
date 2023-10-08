@@ -1,4 +1,4 @@
-import { Entity, init } from "./ecs";
+import { ECS, Entity, init } from "./ecs";
 import { InputSystem } from "./systems/InputSystem";
 import { PhysicsSystem } from "./systems/PhysicsSystem";
 import { DebugRenderSystem } from "./systems/DebugRenderSystem";
@@ -7,6 +7,13 @@ import { Box, Vec2 } from "planck";
 import { PhysicsComponent } from "./components/PhysicsComponent";
 import { EntityType } from "./constants";
 import { FallingRocksSystem } from "./systems/FallingRocksSystem";
+import { HealthComponent } from "./components/HealthComponent";
+import { SpriteComponent } from "./components/SpriteComponent";
+
+import playerIdleSprite from "../public/assets/knight/idle.png";
+import { RenderSystem } from "./systems/RenderSystem";
+import { MovementSystem } from "./systems/MovementSystem";
+import { MovementComponent } from "./components/MovementComponent";
 
 const canvas = document.querySelector("canvas");
 
@@ -28,10 +35,18 @@ const game: Game = {
 	height: canvas.height,
 };
 
-function start(ecs) {
+function start(ecs: ECS) {
 	const loop = () => {
+		if (!game.player) {
+			return;
+		}
+
 		ecs?.tick();
-		requestAnimationFrame(loop);
+
+		const playerHealth = ecs.get(game.player, HealthComponent);
+		if (playerHealth && playerHealth.health > 0) {
+			requestAnimationFrame(loop);
+		}
 	};
 	requestAnimationFrame(loop);
 }
@@ -52,6 +67,9 @@ function main() {
 			shape: new Box(8, 18),
 		}),
 	);
+	ecs.emplace(player, new MovementComponent());
+	ecs.emplace(player, new HealthComponent());
+
 	rocks.forEach((rock, index) => {
 		ecs.emplace(
 			rock,
@@ -65,9 +83,10 @@ function main() {
 
 	game.player = player;
 
-	ecs?.register(InputSystem(ecs, player));
-	ecs?.register(FallingRocksSystem(ecs, rocks));
-	ecs?.register(PhysicsSystem(ecs));
+	ecs.register(InputSystem(ecs, player));
+	ecs.register(MovementSystem(ecs));
+	ecs.register(FallingRocksSystem(ecs, player));
+	ecs.register(PhysicsSystem(ecs));
 	ecs.register(DebugRenderSystem(ecs));
 
 	start(ecs);

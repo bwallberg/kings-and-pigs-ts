@@ -33,11 +33,7 @@ export class PhysicsComponent extends Component {
 		});
 	}
 
-	getPosition() {
-		return this.body.getPosition();
-	}
-
-	getShape() {
+	public get shape() {
 		const shape = this.body.getFixtureList()?.getShape();
 		if (shape) {
 			if (shape.getType() === "polygon") {
@@ -46,14 +42,19 @@ export class PhysicsComponent extends Component {
 		}
 	}
 
-	setVelocity(x?: number, y?: number) {
-		const velocity = this.body.getLinearVelocity();
-		if (x !== undefined) {
-			velocity.x = x;
-		}
-		if (y !== undefined) {
-			velocity.y = y;
-		}
+	public get position() {
+		return this.body.getPosition();
+	}
+
+	public set position(position: Vec2) {
+		this.body.setPosition(position);
+	}
+
+	public get velocity() {
+		return this.body.getLinearVelocity();
+	}
+
+	public set velocity(velocity: Vec2) {
 		this.body.setLinearVelocity(velocity);
 	}
 

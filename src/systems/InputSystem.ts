@@ -1,8 +1,9 @@
-import { Vec2 } from "planck";
-import { PhysicsComponent } from "../components/PhysicsComponent";
-import { EntityType } from "../constants";
 import { ECS, Entity, System } from "../ecs";
-import { isEntityTypeInContact } from "../physics";
+import {
+	MovementComponent,
+	MovementDirection,
+} from "../components/MovementComponent";
+import { MovementState } from "../components/MovementComponent";
 
 const pressed = new Map<string, boolean>();
 
@@ -19,29 +20,19 @@ export const InputSystem = (ecs: ECS, player: Entity): System => ({
 		entities: player ? [player] : [],
 	},
 	handler: ([player]: Entity[]) => {
-		const physics = ecs?.get(player, PhysicsComponent);
-		if (physics) {
-			let x = 0,
-				y;
-			[
-				{ key: "ArrowLeft", x: -50 },
-				{ key: "ArrowRight", x: 50 },
-			].forEach((input) => {
-				if (pressed.get(input.key)) {
-					x += input.x || 0;
-				}
-			});
-
-			if (
-				pressed.get("Space") &&
-				physics.body.getContactList() &&
-				isEntityTypeInContact(physics.body.getContactList()!, EntityType.GROUND)
-			) {
-				y = -20;
-				physics.body.applyLinearImpulse(new Vec2(0, y), physics.body.getWorldCenter());
+		const movement = ecs?.get(player, MovementComponent);
+		if (movement) {
+			if (pressed.get("ArrowLeft")) {
+				movement.direction = MovementDirection.LEFT;
+			} else if (pressed.get("ArrowRight")) {
+				movement.direction = MovementDirection.RIGHT;
+			} else {
+				movement.direction = MovementDirection.IDLE;
 			}
 
-			physics.setVelocity(x, y);
+			if (pressed.get("Space") && movement.state === MovementState.STANDING) {
+				movement.state = MovementState.JUMPING;
+			}
 		}
 	},
 });

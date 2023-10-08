@@ -7,6 +7,7 @@ export const physicsWorld = new World({
 	gravity: new Vec2(0, 9.8),
 });
 
+// TODO: Should these also be entities? 
 export function createWorldEdges(width: number, height: number) {
 	const ground = physicsWorld.createBody({
 		type: "static",

@@ -18,8 +18,8 @@ export const DebugRenderSystem = (ecs: ECS): System => ({
 			const body = ecs?.get(entity, PhysicsComponent);
 
 			if (body) {
-				const { x, y } = body.getPosition();
-				const vertices = body.getShape()?.m_vertices;
+				const { x, y } = body.position;
+				const vertices = body.shape?.m_vertices;
 
 				if (vertices) {
 					context.strokeStyle = "rgba(255, 0, 0, 0.5)";
