@@ -61,37 +61,72 @@ section {
 	padding: 1rem;
 }
 
-.touch {
+.gamepad {
 	position: absolute;
 	top: 0;
 	left: 0;
 	width: 100%;
 	height: 100%;
+	pointer-events: none;
 
 	display: flex;
-	flex-direction: column;
+	justify-content: space-between;
+	align-items: flex-end;
+	padding: 20px;
+	box-sizing: border-box;
 }
 
-.touch .movement {
-	flex: 1;
+.joystick-container {
+	pointer-events: all;
+	position: relative;
+}
 
+.joystick-base {
+	width: 80px;
+	height: 80px;
+	background: rgba(255, 255, 255, 0.2);
+	border: 2px solid rgba(255, 255, 255, 0.4);
+	border-radius: 50%;
+	position: relative;
 	display: flex;
-	flex-direction: row;
+	justify-content: center;
+	align-items: center;
 }
 
-.touch .jump {
-	flex: 1;
-	/*				background: rgba(255, 0, 0, 0.5);*/
+.joystick-knob {
+	width: 40px;
+	height: 40px;
+	background: rgba(255, 255, 255, 0.8);
+	border: 2px solid rgba(255, 255, 255, 1);
+	border-radius: 50%;
+	position: absolute;
+	transition: all 0.1s ease;
+	box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
 }
 
-.touch .left {
-	flex: 1;
-	/*				background: rgba(0, 255, 0, 0.5);*/
+.jump-button {
+	pointer-events: all;
+	width: 80px;
+	height: 80px;
+	background: rgba(255, 255, 255, 0.2);
+	border: 2px solid rgba(255, 255, 255, 0.4);
+	border-radius: 50%;
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	font-family: "pixelify", sans-serif;
+	font-size: 12px;
+	font-weight: bold;
+	color: rgba(255, 255, 255, 0.9);
+	text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
+	transition: all 0.1s ease;
+	user-select: none;
 }
 
-.touch .right {
-	flex: 1;
-	/*				background: rgba(0, 0, 255, 0.5);*/
+.jump-button:active {
+	background: rgba(255, 255, 255, 0.4);
+	border-color: rgba(255, 255, 255, 0.8);
+	transform: scale(0.95);
 }
 
 #restart {
